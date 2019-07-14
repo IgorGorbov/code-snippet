@@ -9,7 +9,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "NODE_ENV=development nodemon server.js",
-    "test": "jest",
+    "test": "DATABASE_URL=postgres://postgres:postgres@127.0.0.1/testdb jest",
     "test:watch": "jest --watch"
   },
   "dependencies": {

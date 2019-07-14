@@ -10,4 +10,4 @@ cache:
 before_script:
   - psql -c 'create database travis_ci_test;' -U postgres
 env:
-  - DATABASE_URL=postgres://postgres:postgres@127.0.0.1/travis_ci_test
+  - DATABASE_URL=postgres://postgres:postgres@127.0.0.1/testdb
