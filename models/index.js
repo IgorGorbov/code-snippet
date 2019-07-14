@@ -1,5 +1,7 @@
 const Sequelize = require('sequelize');
 
+console.log('NODE_ENV', process.env.NODE_ENV);
+
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: 'postgres',
   logging: false
