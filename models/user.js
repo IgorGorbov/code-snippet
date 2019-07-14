@@ -1,3 +1,5 @@
+const bcrypt = require('bcrypt');
+
 const user = (sequelize, DataTypes) => {
   const User = sequelize.define('user', {
     username: {
@@ -13,6 +15,11 @@ const user = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: false
     }
+  });
+
+  // eslint-disable-next-line no-shadow
+  User.beforeCreate(async user => {
+    user.password = await bcrypt.hash(user.password, 12); // eslint-disable-line no-param-reassign
   });
 
   User.associate = models => {
