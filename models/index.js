@@ -24,4 +24,15 @@ Object.keys(models).forEach(key => {
   if ('associate' in models[key]) models[key].associate(models);
 });
 
-module.exports = { sequelize, models };
+function FactoryModels(modelName) {
+  const create = async props => {
+    const doc = await models[modelName].create(props);
+    return doc;
+  };
+
+  return {
+    create
+  };
+}
+
+module.exports = { sequelize, FactoryModels };
