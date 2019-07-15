@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize');
+const pick = require('lodash/pick');
 
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: 'postgres',
@@ -30,9 +31,17 @@ function FactoryModels(modelName) {
     return doc;
   };
 
+  const find = async (where, props = [], include = []) => {
+    if (!where) return null;
+
+    const doc = await models[modelName].findOne({ where, include });
+    return pick(doc, props);
+  };
+
   return {
-    create
+    create,
+    find
   };
 }
 
-module.exports = { sequelize, FactoryModels };
+module.exports = { sequelize, models, FactoryModels };

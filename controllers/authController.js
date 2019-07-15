@@ -3,7 +3,7 @@ const pick = require('lodash/pick');
 const Joi = require('joi');
 const { FactoryModels } = require('../models');
 
-const validate = req => {
+const validate = (req, type) => {
   const schema = {
     username: Joi.string()
       .alphanum()
@@ -12,6 +12,11 @@ const validate = req => {
       .required(),
     password: Joi.string().regex(/^[a-zA-Z0-9]{3,30}$/)
   };
+
+  if (type === 'signup')
+    schema.confirmPassword = Joi.string()
+      .required()
+      .valid(Joi.ref('password'));
 
   return Joi.validate(req, schema);
 };
@@ -39,12 +44,30 @@ const createSendToken = (user, statusCode, req, res) => {
 };
 
 exports.signup = async (req, res) => {
-  const { error } = validate(req.body);
+  const { error } = validate(req.body, 'signup');
   if (error) return res.status(400).send(error.details[0].message);
 
   try {
     const user = await FactoryModels('User').create(req.body);
     return createSendToken(user, 201, req, res);
+  } catch (err) {
+    console.log(err.message);
+    return res.status(400).send(err.message);
+  }
+};
+
+exports.login = async (req, res) => {
+  const { error } = validate(req.body, 'login');
+  if (error) return res.status(400).send(error.details[0].message);
+
+  try {
+    const user = await FactoryModels('User').find({ username: req.body.username }, [
+      'id',
+      'username',
+      'isAdmin'
+    ]);
+
+    return createSendToken(user, 200, req, res);
   } catch (err) {
     console.log(err.message);
     return res.status(400).send(err.message);
