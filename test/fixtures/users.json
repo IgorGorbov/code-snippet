@@ -1,0 +1,11 @@
+[
+    {
+        "model":"User",
+        "data": {
+            "id": 1,
+            "username": "test",
+            "password": "1234",
+            "isAdmin": false
+        }
+    }
+]
