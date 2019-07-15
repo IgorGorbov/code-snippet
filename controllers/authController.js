@@ -1,9 +1,7 @@
 const jwt = require('jsonwebtoken');
 const pick = require('lodash/pick');
 const Joi = require('joi');
-const {
-  models: { User }
-} = require('../models');
+const { FactoryModels } = require('../models');
 
 const validate = req => {
   const schema = {
@@ -45,7 +43,7 @@ exports.signup = async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message);
 
   try {
-    const user = await User.create(req.body);
+    const user = await FactoryModels('User').create(req.body);
     return createSendToken(user, 201, req, res);
   } catch (err) {
     console.log(err.message);

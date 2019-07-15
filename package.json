@@ -9,8 +9,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "NODE_ENV=development nodemon server.js",
-    "test": "DATABASE_URL=postgres://postgres:postgres@127.0.0.1/testdb jest",
-    "test:watch": "jest --watch"
+    "test": "DATABASE_URL=postgres://postgres:postgres@127.0.0.1/testdb JWT_SECRET=Test JWT_EXPIRES_IN=1d JWT_COOKIE_EXPIRES_IN=1 jest",
+    "test:watch": "DATABASE_URL=postgres://postgres:postgres@127.0.0.1/testdb JWT_SECRET=Test JWT_EXPIRES_IN=1d JWT_COOKIE_EXPIRES_IN=1 jest --watch"
   },
   "dependencies": {
     "bcrypt": "^3.0.6",
