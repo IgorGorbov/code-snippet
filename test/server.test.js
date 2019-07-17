@@ -63,10 +63,7 @@ describe('POST /api/users/signup', () => {
 
 describe('POST /api/users/login', () => {
   const testUser = { id: 1, username: 'test', password: '1234', isAdmin: false };
-  const fixures = {
-    model: 'User',
-    data: { ...testUser }
-  };
+  const fixures = { model: 'User', data: { ...testUser } };
 
   beforeEach(async () => {
     await fixtures.loadFixture(fixures, models);
@@ -97,6 +94,38 @@ describe('POST /api/users/login', () => {
         expect(user.username).toBe(testUser.username);
         expect(user.password).toBeUndefined();
         expect(user.isAdmin).toBeFalsy();
+      });
+  });
+});
+
+describe('POST /api/snippets', () => {
+  const testSnippet = {
+    userId: 1,
+    title: 'Cont variable',
+    code: 'const a = 5;',
+    categories: [{ name: 'JavaScript' }]
+  };
+  const testUser = { id: 1, username: 'test', password: '1234', isAdmin: false };
+  const fixures = { model: 'User', data: { ...testUser } };
+
+  beforeEach(async () => {
+    await fixtures.loadFixture(fixures, models);
+  });
+
+  test('It should return new snippet', async () => {
+    return request(app)
+      .post('/api/v1/snippets')
+      .send(testSnippet)
+      .expect(201)
+      .then(response => {
+        const { status, snippet } = response.body;
+
+        expect(status).toBe('success');
+        expect(snippet.id).not.toBeNaN();
+        expect(snippet.userId).not.toBeNaN();
+        expect(snippet.title).toBe(testSnippet.title);
+        expect(snippet.code).toBe(testSnippet.code);
+        expect(snippet.categories).not.toBeUndefined();
       });
   });
 });
