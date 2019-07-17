@@ -3,7 +3,7 @@ const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 
-const userRouter = require('./routes/userRoutes');
+const userRouter = require('./routes/authRoutes');
 const snippetRouter = require('./routes/snippetRoutes.js');
 const categoryRouter = require('./routes/categoryRoutes');
 
