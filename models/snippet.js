@@ -4,8 +4,8 @@ const snippet = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false
     },
-    text: {
-      type: DataTypes.STRING,
+    code: {
+      type: DataTypes.STRING(1024),
       allowNull: false
     }
   });
