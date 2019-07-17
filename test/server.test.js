@@ -1,5 +1,6 @@
+const path = require('path');
 const request = require('supertest');
-const fixtures = require('sequelize-fixtures');
+const sequelizeFixtures = require('sequelize-fixtures');
 
 const app = require('../app');
 const { sequelize, models } = require('../models');
@@ -66,7 +67,7 @@ describe('POST /api/users/login', () => {
   const fixures = { model: 'User', data: { ...testUser } };
 
   beforeEach(async () => {
-    await fixtures.loadFixture(fixures, models);
+    await sequelizeFixtures.loadFixture(fixures, models);
   });
 
   test('It should save cookies', async () => {
@@ -90,7 +91,7 @@ describe('POST /api/users/login', () => {
 
         expect(status).toBe('success');
         expect(token).toHaveLength(137);
-        expect(user.id).not.toBeNaN();
+        expect(user.id).toEqual(expect.any(Number));;
         expect(user.username).toBe(testUser.username);
         expect(user.password).toBeUndefined();
         expect(user.isAdmin).toBeFalsy();
@@ -105,11 +106,14 @@ describe('POST /api/snippets', () => {
     code: 'const a = 5;',
     categories: [{ name: 'JavaScript' }]
   };
-  const testUser = { id: 1, username: 'test', password: '1234', isAdmin: false };
-  const fixures = { model: 'User', data: { ...testUser } };
+
+  const fixures = {
+    model: 'User',
+    data: { id: 1, username: 'test', password: '1234', isAdmin: false }
+  };
 
   beforeEach(async () => {
-    await fixtures.loadFixture(fixures, models);
+    await sequelizeFixtures.loadFixture(fixures, models);
   });
 
   test('It should return new snippet', async () => {
@@ -121,11 +125,37 @@ describe('POST /api/snippets', () => {
         const { status, snippet } = response.body;
 
         expect(status).toBe('success');
-        expect(snippet.id).not.toBeNaN();
-        expect(snippet.userId).not.toBeNaN();
+        expect(snippet.id).toEqual(expect.any(Number));;
+        expect(snippet.userId).toEqual(expect.any(Number));;
         expect(snippet.title).toBe(testSnippet.title);
         expect(snippet.code).toBe(testSnippet.code);
-        expect(snippet.categories).not.toBeUndefined();
+        expect(snippet.categories).toEqual(expect.any(Array));
+      });
+  });
+});
+
+describe('GET /api/snippets/:id', () => {
+  beforeEach(async () => {
+    const files = ['user.json', 'category.json', 'snippet.json'];
+    await sequelizeFixtures.loadFiles(
+      files.map(file => path.join(__dirname, 'fixtures', file)),
+      models
+    );
+  });
+
+  test('It should return snippet', async () => {
+    return request(app)
+      .get('/api/v1/snippets/1')
+      .expect(200)
+      .then(response => {
+        const { status, snippet } = response.body;
+
+        expect(status).toBe('success');
+        expect(snippet.id).toEqual(expect.any(Number));
+        expect(snippet.userId).toEqual(expect.any(Number));
+        expect(snippet.title).toEqual(expect.any(String));
+        expect(snippet.code).toEqual(expect.any(String));
+        expect(snippet.categories).toEqual(expect.any(Array));
       });
   });
 });

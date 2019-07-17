@@ -1,0 +1,7 @@
+[{
+  "model": "Category",
+  "data": {
+    "id": 1,
+    "name": "JavaScript"
+  }
+}]

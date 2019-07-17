@@ -1,0 +1,10 @@
+[{
+    "model": "Snippet",
+    "data": {
+        "id": 1,
+        "userId": 1,
+        "title": "Const variable",
+        "code": "const a = 5;",
+        "categories": [1]
+    }
+}]
