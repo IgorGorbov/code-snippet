@@ -1,5 +1,4 @@
 const Sequelize = require('sequelize');
-const pick = require('lodash/pick');
 
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: 'postgres',
@@ -26,16 +25,19 @@ Object.keys(models).forEach(key => {
 });
 
 function FactoryModels(modelName) {
-  const create = async props => {
-    const doc = await models[modelName].create(props);
+  const create = async (props, include) => {
+    let doc = null;
+    if (props && include) doc = await models[modelName].create(props, include);
+    else doc = await models[modelName].create(props);
+
     return doc;
   };
 
-  const find = async (where, props = [], include = []) => {
+  const find = async (where, include = []) => {
     if (!where) return null;
 
     const doc = await models[modelName].findOne({ where, include });
-    return pick(doc, props);
+    return doc;
   };
 
   return {

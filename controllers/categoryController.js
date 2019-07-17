@@ -5,8 +5,7 @@ const { FactoryModels } = require('../models');
 const validate = req => {
   const schema = {
     name: Joi.string()
-      .min(1)
-      .max(40)
+      .max(255)
       .required()
   };
 

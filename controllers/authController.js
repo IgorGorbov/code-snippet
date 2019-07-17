@@ -61,11 +61,8 @@ exports.login = async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message);
 
   try {
-    const user = await FactoryModels('User').find({ username: req.body.username }, [
-      'id',
-      'username',
-      'isAdmin'
-    ]);
+    const createdUser = await FactoryModels('User').find({ username: req.body.username });
+    const user = pick(createdUser, ['id', 'username', 'isAdmin']);
 
     return createSendToken(user, 200, req, res);
   } catch (err) {
