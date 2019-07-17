@@ -100,3 +100,21 @@ describe('POST /api/users/login', () => {
       });
   });
 });
+
+describe('POST /api/categories', () => {
+  const testCategory = { name: 'React' };
+
+  test('It should return new category', async () => {
+    return request(app)
+      .post('/api/v1/categories')
+      .send(testCategory)
+      .expect(201)
+      .then(response => {
+        const { status, category } = response.body;
+
+        expect(status).toBe('success');
+        expect(category.id).not.toBeNaN();
+        expect(category.name).toBe(testCategory.name);
+      });
+  });
+});
