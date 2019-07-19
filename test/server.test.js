@@ -91,7 +91,7 @@ describe('POST /api/users/login', () => {
 
         expect(status).toBe('success');
         expect(token).toHaveLength(137);
-        expect(user.id).toEqual(expect.any(Number));;
+        expect(user.id).toEqual(expect.any(Number));
         expect(user.username).toBe(testUser.username);
         expect(user.password).toBeUndefined();
         expect(user.isAdmin).toBeFalsy();
@@ -125,8 +125,8 @@ describe('POST /api/snippets', () => {
         const { status, snippet } = response.body;
 
         expect(status).toBe('success');
-        expect(snippet.id).toEqual(expect.any(Number));;
-        expect(snippet.userId).toEqual(expect.any(Number));;
+        expect(snippet.id).toEqual(expect.any(Number));
+        expect(snippet.userId).toEqual(expect.any(Number));
         expect(snippet.title).toBe(testSnippet.title);
         expect(snippet.code).toBe(testSnippet.code);
         expect(snippet.categories).toEqual(expect.any(Array));
@@ -157,6 +157,58 @@ describe('GET /api/snippets/:id', () => {
         expect(snippet.code).toEqual(expect.any(String));
         expect(snippet.categories).toEqual(expect.any(Array));
       });
+  });
+});
+
+describe('PATCH /api/snippets/:id', () => {
+  const testSnippet = {
+    title: 'let variable',
+    code: 'let a = 2;',
+    categories: [{ name: 'React' }]
+  };
+
+  beforeEach(async () => {
+    const files = ['user.json', 'category.json', 'snippet.json'];
+    await sequelizeFixtures.loadFiles(
+      files.map(file => path.join(__dirname, 'fixtures', file)),
+      models
+    );
+  });
+
+  test('It should return 200', async () => {
+    return request(app)
+      .patch('/api/v1/snippets/1')
+      .send(testSnippet)
+      .expect(200);
+  });
+
+  test('It should return 400', async () => {
+    return request(app)
+      .patch('/api/v1/snippets/100')
+      .send(testSnippet)
+      .expect(400);
+  });
+});
+
+describe('DELETE /api/snippets/:id', () => {
+  beforeEach(async () => {
+    const files = ['user.json', 'category.json', 'snippet.json'];
+    await sequelizeFixtures.loadFiles(
+      files.map(file => path.join(__dirname, 'fixtures', file)),
+      models
+    );
+  });
+
+  test('It should return 200', async () => {
+    return request(app)
+      .delete('/api/v1/snippets/1')
+      .expect(200);
+  });
+
+  test('It should return 400', async () => {
+    return request(app)
+      .delete('/api/v1/snippets/100')
+      .expect(400);
   });
 });
 
