@@ -40,9 +40,27 @@ function FactoryModels(modelName) {
     return doc;
   };
 
+  const update = async (data, where, include = []) => {
+    if (!data || !where) return false;
+
+    const [rowsUpdate] = await models[modelName].update(data, { where, include });
+
+    return !!rowsUpdate;
+  };
+
+  const remove = async where => {
+    if (!where) return false;
+
+    const rowsDeleted = await models[modelName].destroy({ where });
+
+    return !!rowsDeleted;
+  };
+
   return {
     create,
-    find
+    find,
+    update,
+    remove
   };
 }
 

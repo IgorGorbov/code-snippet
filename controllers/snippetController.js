@@ -19,7 +19,21 @@ const validate = (req, type) => {
       };
       break;
 
+    case 'update':
+      schema = {
+        id: Joi.number().required(),
+        title: Joi.string()
+          .max(255)
+          .required(),
+        code: Joi.string()
+          .max(1020)
+          .required(),
+        categories: Joi.array().items(Joi.object())
+      };
+      break;
+
     case 'get':
+    case 'remove':
       schema = { id: Joi.number().required() };
       break;
 
@@ -70,6 +84,36 @@ exports.get = async (req, res) => {
   }
 };
 
-exports.update = async (req, res) => {};
+exports.update = async (req, res) => {
+  const { error } = validate({ ...req.params, ...req.body }, 'update');
+  if (error) return res.status(400).send(error.details[0].message);
 
-exports.delete = async (req, res) => {};
+  try {
+    const isUpdated = await FactoryModels('Snippet').update(req.body, req.params, [
+      models.Category
+    ]);
+
+    if (isUpdated) return res.status(200).json({ status: 'success' });
+
+    return res.status(400).send("Couldn't update snippet.");
+  } catch (err) {
+    console.log(err.message);
+    return res.status(400).send(err.message);
+  }
+};
+
+exports.delete = async (req, res) => {
+  const { error } = validate(req.params, 'remove');
+  if (error) return res.status(400).send(error.details[0].message);
+
+  try {
+    const isDeleted = await FactoryModels('Snippet').remove({ id: req.params.id });
+
+    if (isDeleted) return res.status(200).json({ status: 'success' });
+
+    return res.status(400).send("Couldn't delete snippet.");
+  } catch (err) {
+    console.log(err.message);
+    return res.status(400).send(err.message);
+  }
+};
