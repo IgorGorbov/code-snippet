@@ -1,6 +1,7 @@
 [{
   "model": "Category",
   "data": {
+    "userId": 1,
     "id": 1,
     "name": "JavaScript"
   }

@@ -8,7 +8,6 @@ const validate = (req, type) => {
   switch (type) {
     case 'create':
       schema = {
-        userId: Joi.number().required(),
         title: Joi.string()
           .max(255)
           .required(),
@@ -49,10 +48,12 @@ exports.create = async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message);
 
   try {
-    const createdSnippet = await FactoryModels('Snippet').create(req.body, {
+    const data = { ...req.body, userId: req.user.id };
+    const createdSnippet = await FactoryModels('Snippet').create(data, {
       include: [models.Category]
     });
     const snippet = pick(createdSnippet, ['id', 'userId', 'title', 'code', 'categories']);
+    snippet.categories = snippet.categories.map(category => pick(category, ['id', 'name']));
 
     return res.status(201).json({
       status: 'success',
@@ -69,10 +70,10 @@ exports.get = async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message);
 
   try {
-    const foundSnippet = await FactoryModels('Snippet').find({ id: req.params.id }, [
-      models.Category
-    ]);
+    const where = { id: req.params.id };
+    const foundSnippet = await FactoryModels('Snippet').find(where, [models.Category]);
     const snippet = pick(foundSnippet, ['id', 'userId', 'title', 'code', 'categories']);
+    snippet.categories = snippet.categories.map(category => pick(category, ['id', 'name']));
 
     return res.status(200).json({
       status: 'success',
@@ -89,9 +90,8 @@ exports.update = async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message);
 
   try {
-    const isUpdated = await FactoryModels('Snippet').update(req.body, req.params, [
-      models.Category
-    ]);
+    const where = { ...req.params, userId: req.user.id };
+    const isUpdated = await FactoryModels('Snippet').update(req.body, where, [models.Category]);
 
     if (isUpdated) return res.status(200).json({ status: 'success' });
 
@@ -107,7 +107,8 @@ exports.delete = async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message);
 
   try {
-    const isDeleted = await FactoryModels('Snippet').remove({ id: req.params.id });
+    const where = { id: req.params.id, userId: req.user.id };
+    const isDeleted = await FactoryModels('Snippet').remove(where);
 
     if (isDeleted) return res.status(200).json({ status: 'success' });
 

@@ -17,11 +17,12 @@ exports.create = async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message);
 
   try {
-    const category = await FactoryModels('Category').create(req.body);
+    const data = { ...req.body, userId: req.user.id };
+    const category = await FactoryModels('Category').create(data);
 
     return res.status(201).json({
       status: 'success',
-      category: pick(category, ['id', 'name'])
+      category: pick(category, ['id', 'userId', 'name'])
     });
   } catch (err) {
     console.log(err.message);

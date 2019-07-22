@@ -1,4 +1,5 @@
 const path = require('path');
+const jwt = require('jsonwebtoken');
 const request = require('supertest');
 const sequelizeFixtures = require('sequelize-fixtures');
 
@@ -22,12 +23,12 @@ describe('GET /', () => {
   });
 });
 
-describe('POST /api/users/signup', () => {
+describe('POST /signup', () => {
   const testUser = { username: 'test', password: '1234', confirmPassword: '1234' };
 
   test('It should save cookies', () => {
     return request(app)
-      .post('/api/v1/users/signup')
+      .post('/signup')
       .send(testUser)
       .expect(201)
       .then(response => {
@@ -38,7 +39,7 @@ describe('POST /api/users/signup', () => {
 
   test('It should return new user', () => {
     return request(app)
-      .post('/api/v1/users/signup')
+      .post('/signup')
       .send(testUser)
       .expect(201)
       .then(response => {
@@ -56,13 +57,13 @@ describe('POST /api/users/signup', () => {
   test('It should response with 400', () => {
     const notValidUser = { username: 't', password: '1234', confirmPassword: '12' };
     return request(app)
-      .post('/api/v1/users/signup')
+      .post('/signup')
       .send(notValidUser)
       .expect(400);
   });
 });
 
-describe('POST /api/users/login', () => {
+describe('POST /login', () => {
   const testUser = { id: 1, username: 'test', password: '1234', isAdmin: false };
   const fixures = { model: 'User', data: { ...testUser } };
 
@@ -72,7 +73,7 @@ describe('POST /api/users/login', () => {
 
   test('It should save cookies', async () => {
     return request(app)
-      .post('/api/v1/users/login')
+      .post('/login')
       .send({ username: testUser.username, password: testUser.password })
       .expect(200)
       .then(response => {
@@ -83,7 +84,7 @@ describe('POST /api/users/login', () => {
 
   test('It should return user', async () => {
     return request(app)
-      .post('/api/v1/users/login')
+      .post('/login')
       .send({ username: testUser.username, password: testUser.password })
       .expect(200)
       .then(response => {
@@ -100,9 +101,14 @@ describe('POST /api/users/login', () => {
 });
 
 describe('POST /api/snippets', () => {
+  const token = jwt.sign({ id: 1 }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN
+  });
+
+  const cookie = [`jwt=${token}`];
+
   const testSnippet = {
-    userId: 1,
-    title: 'Cont variable',
+    title: 'Const variable',
     code: 'const a = 5;',
     categories: [{ name: 'JavaScript' }]
   };
@@ -119,6 +125,7 @@ describe('POST /api/snippets', () => {
   test('It should return new snippet', async () => {
     return request(app)
       .post('/api/v1/snippets')
+      .set('Cookie', cookie)
       .send(testSnippet)
       .expect(201)
       .then(response => {
@@ -161,6 +168,12 @@ describe('GET /api/snippets/:id', () => {
 });
 
 describe('PATCH /api/snippets/:id', () => {
+  const token = jwt.sign({ id: 1 }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN
+  });
+
+  const cookie = [`jwt=${token}`];
+
   const testSnippet = {
     title: 'let variable',
     code: 'let a = 2;',
@@ -178,6 +191,7 @@ describe('PATCH /api/snippets/:id', () => {
   test('It should return 200', async () => {
     return request(app)
       .patch('/api/v1/snippets/1')
+      .set('Cookie', cookie)
       .send(testSnippet)
       .expect(200);
   });
@@ -185,12 +199,19 @@ describe('PATCH /api/snippets/:id', () => {
   test('It should return 400', async () => {
     return request(app)
       .patch('/api/v1/snippets/100')
+      .set('Cookie', cookie)
       .send(testSnippet)
       .expect(400);
   });
 });
 
 describe('DELETE /api/snippets/:id', () => {
+  const token = jwt.sign({ id: 1 }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN
+  });
+
+  const cookie = [`jwt=${token}`];
+
   beforeEach(async () => {
     const files = ['user.json', 'category.json', 'snippet.json'];
     await sequelizeFixtures.loadFiles(
@@ -202,29 +223,43 @@ describe('DELETE /api/snippets/:id', () => {
   test('It should return 200', async () => {
     return request(app)
       .delete('/api/v1/snippets/1')
+      .set('Cookie', cookie)
       .expect(200);
   });
 
   test('It should return 400', async () => {
     return request(app)
       .delete('/api/v1/snippets/100')
+      .set('Cookie', cookie)
       .expect(400);
   });
 });
 
 describe('POST /api/categories', () => {
+  const token = jwt.sign({ id: 1 }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN
+  });
+
+  const cookie = [`jwt=${token}`];
+
   const testCategory = { name: 'React' };
+
+  beforeEach(async () => {
+    await sequelizeFixtures.loadFile(path.join(__dirname, 'fixtures', 'user.json'), models);
+  });
 
   test('It should return new category', async () => {
     return request(app)
       .post('/api/v1/categories')
+      .set('Cookie', cookie)
       .send(testCategory)
       .expect(201)
       .then(response => {
         const { status, category } = response.body;
 
         expect(status).toBe('success');
-        expect(category.id).not.toBeNaN();
+        expect(category.id).toEqual(expect.any(Number));
+        expect(category.userId).toEqual(expect.any(Number));
         expect(category.name).toBe(testCategory.name);
       });
   });

@@ -7,7 +7,7 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "start": "node server.js",
+    "start": "NODE_ENV=development node server.js",
     "dev": "NODE_ENV=development nodemon server.js",
     "test": "DATABASE_URL=postgres://postgres:postgres@127.0.0.1/testdb JWT_SECRET=Test JWT_EXPIRES_IN=1d JWT_COOKIE_EXPIRES_IN=1 jest",
     "test:watch": "DATABASE_URL=postgres://postgres:postgres@127.0.0.1/testdb JWT_SECRET=Test JWT_EXPIRES_IN=1d JWT_COOKIE_EXPIRES_IN=1 jest --watch"
