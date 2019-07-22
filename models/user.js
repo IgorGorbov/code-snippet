@@ -24,6 +24,7 @@ const user = (sequelize, DataTypes) => {
 
   User.associate = models => {
     User.hasMany(models.Snippet, { onDelete: 'CASCADE' });
+    User.hasMany(models.Category, { onDelete: 'CASCADE' });
   };
 
   return User;

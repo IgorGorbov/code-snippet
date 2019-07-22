@@ -3,7 +3,7 @@ const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 
-const userRouter = require('./routes/authRoutes');
+const authRoutes = require('./routes/authRoutes');
 const snippetRouter = require('./routes/snippetRoutes.js');
 const categoryRouter = require('./routes/categoryRoutes');
 
@@ -13,7 +13,7 @@ if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 
 app.use(cookieParser());
 
-app.use('/api/v1/users', bodyParser.json(), userRouter);
+app.use('/', bodyParser.json(), authRoutes);
 app.use('/api/v1/snippets', bodyParser.json(), snippetRouter);
 app.use('/api/v1/categories', bodyParser.json(), categoryRouter);
 
