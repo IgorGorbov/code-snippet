@@ -72,6 +72,20 @@ exports.get = async (req, res) => {
   }
 };
 
+exports.getAll = async (req, res) => {
+  try {
+    const where = { userId: req.user.id };
+    const attributes = ['id', 'name', 'userId'];
+
+    const categories = await FactoryModels('Category').findAll(where, attributes);
+
+    return res.status(200).json({ status: 'success', categories });
+  } catch (err) {
+    console.log(err.message);
+    return res.status(400).send(err.message);
+  }
+};
+
 exports.update = async (req, res) => {
   const { error } = validate({ ...req.params, ...req.body }, 'update');
   if (error) return res.status(400).send(error.details[0].message);
