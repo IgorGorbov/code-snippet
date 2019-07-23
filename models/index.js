@@ -40,6 +40,13 @@ function FactoryModels(modelName) {
     return doc;
   };
 
+  const findAll = async (where, attributes = [], include = []) => {
+    if (!where) return null;
+
+    const doc = await models[modelName].findAll({ where, attributes, include });
+    return doc;
+  };
+
   const update = async (data, where, include = []) => {
     if (!data || !where) return false;
 
@@ -59,6 +66,7 @@ function FactoryModels(modelName) {
   return {
     create,
     find,
+    findAll,
     update,
     remove
   };

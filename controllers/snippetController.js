@@ -65,6 +65,22 @@ exports.create = async (req, res) => {
   }
 };
 
+exports.getAll = async (req, res) => {
+  try {
+    const where = { userId: req.user.id };
+    const attributes = ['id', 'userId', 'title', 'code'];
+
+    const snippets = await FactoryModels('Snippet').findAll(where, attributes, [
+      { model: models.Category, attributes: ['id', 'name'], through: { attributes: [] } }
+    ]);
+
+    return res.status(200).json({ status: 'success', snippets });
+  } catch (err) {
+    console.log(err.message);
+    return res.status(400).send(err.message);
+  }
+};
+
 exports.get = async (req, res) => {
   const { error } = validate(req.params, 'get');
   if (error) return res.status(400).send(error.details[0].message);
